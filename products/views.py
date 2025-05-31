@@ -1,7 +1,9 @@
 from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from .models import Product
-from .serializers import ProductSerializer
+from .serializers import ProductsSerializer, ProductSerializer
 
 
 class ProductPagination(PageNumberPagination):
@@ -9,5 +11,21 @@ class ProductPagination(PageNumberPagination):
 
 class ProductListAPIView(generics.ListAPIView):
     queryset = Product.objects.filter(is_active=True).all()
-    serializer_class = ProductSerializer
+    serializer_class = ProductsSerializer
     pagination_class = ProductPagination
+
+class HomeProductListAPIView(APIView):
+    def get(self, request):
+        featured_products = Product.objects.filter(is_active=True).order_by('-created_at')[:12]
+        featured_products_serializer = ProductsSerializer(featured_products, many=True)
+        return Response({'featured_products': featured_products_serializer.data, 'recommended_products': featured_products_serializer.data})
+
+class ProductDetailAPIView(generics.RetrieveAPIView):
+    queryset = Product.objects.filter(is_active=True)
+    serializer_class = ProductSerializer
+    lookup_field = 'id'
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
