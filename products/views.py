@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from .models import Product
-from .serializers import ProductsSerializer, ProductSerializer
+from .serializers import ProductsSerializer
 
 
 class ProductPagination(PageNumberPagination):
@@ -22,7 +22,7 @@ class HomeProductListAPIView(APIView):
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.filter(is_active=True)
-    serializer_class = ProductSerializer
+    serializer_class = ProductsSerializer
     lookup_field = 'id'
 
     def get_serializer_context(self):

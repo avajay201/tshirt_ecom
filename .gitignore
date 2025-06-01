@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.env
+*.venv
+venv/
+ENV/
+env/
+.Python
+
+# Django
+*.log
+staticfiles/
+local_settings.py
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Test Coverage
+htmlcov/
+.coverage
+coverage.xml
+
+# pip
+pip-log.txt
+
+# mypy
+.mypy_cache/
+
+# dotenv
+.env.*
+.env
+
+# Celery
+celerybeat-schedule
+
+# gunicorn
+gunicorn.pid

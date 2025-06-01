@@ -22,18 +22,18 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         model = ProductVariant
         fields = ['id', 'size', 'color_name', 'color_code', 'gender', 'age_group', 'price', 'images']
 
-class ProductsSerializer(serializers.ModelSerializer):
-    variant = serializers.SerializerMethodField()
+# class ProductsSerializer(serializers.ModelSerializer):
+#     variant = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Product
-        fields = ['id', 'name', 'description', 'tags', 'base_price', 'variant']
+#     class Meta:
+#         model = Product
+#         fields = ['id', 'name', 'description', 'tags', 'base_price', 'variant']
 
-    def get_variant(self, obj):
-        variant = obj.variants.first()
-        if variant:
-            return ProductVariantSerializer(variant).data
-        return None
+#     def get_variant(self, obj):
+#         variant = obj.variants.first()
+#         if variant:
+#             return ProductVariantSerializer(variant).data
+#         return None
 
 class ProductReviews(serializers.ModelSerializer):
     class Meta:
@@ -45,17 +45,23 @@ class ProductReviews(serializers.ModelSerializer):
         representation['name'] = instance.user.first_name + instance.user.last_name if instance.user else 'Anonymous'
         return representation
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['name', 'description']
+        fields = ['id', 'name', 'description']
 
     def to_representation(self, instance):
         # Filter variants by color and size if provided
-        request = self.context.get('request')
-        color = request.query_params.get('color')
-        size = request.query_params.get('size')
+        color = None
+        size = None
+        
+        try:
+            request = self.context.get('request')
+            color = request.query_params.get('color')
+            size = request.query_params.get('size')
+        except AttributeError:
+            pass
 
         variants_qs = instance.variants.all()
         if color:
