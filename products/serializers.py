@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, ProductVariant, ProductVariantImage
+from .models import Product, ProductVariant, ProductVariantImage, ProductReview
 from django.conf import settings
 from django.db.models import Avg
 from rest_framework.exceptions import ValidationError
@@ -22,22 +22,9 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         model = ProductVariant
         fields = ['id', 'size', 'color_name', 'color_code', 'gender', 'age_group', 'price', 'images']
 
-# class ProductsSerializer(serializers.ModelSerializer):
-#     variant = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = Product
-#         fields = ['id', 'name', 'description', 'tags', 'base_price', 'variant']
-
-#     def get_variant(self, obj):
-#         variant = obj.variants.first()
-#         if variant:
-#             return ProductVariantSerializer(variant).data
-#         return None
-
 class ProductReviews(serializers.ModelSerializer):
     class Meta:
-        model = Product
+        model = ProductReview
         fields = ['rating', 'comment', 'created_at']
 
     def to_representation(self, instance):
@@ -78,6 +65,7 @@ class ProductsSerializer(serializers.ModelSerializer):
 
         representation['price'] = variant.price
         representation['stock'] = variant.stock
+        representation['variant'] = variant.id
 
         all_variants = instance.variants.all()
         colors_qs = all_variants.values_list('color_name', 'color_code').distinct()
