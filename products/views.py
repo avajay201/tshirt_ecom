@@ -3,7 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from .models import Product
-from .serializers import ProductsSerializer
+from .serializers import ProductsSerializer, ProductReviewsSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from .utils import get_first_serializer_error
 
 
 class ProductPagination(PageNumberPagination):
@@ -29,3 +32,17 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+
+
+class SubmitProductReview(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data.copy()
+        data['user'] = request.user
+        serializer = ProductReviewsSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response({"message": "Review submitted successfully", "review": serializer.data}, status=status.HTTP_201_CREATED)
+        error = get_first_serializer_error(serializer.errors)
+        return Response(error, status=status.HTTP_400_BAD_REQUEST)

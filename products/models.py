@@ -29,6 +29,7 @@ class Category(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
+    features = models.TextField(help_text="New line separated of product features")
     # category = models.ForeignKey(Category, related_name='products', on_delete=models.SET_NULL, null=True, blank=True)
     tags = models.TextField(blank=True, help_text="Comma-separated tags")
     is_active = models.BooleanField(default=True)
@@ -51,9 +52,24 @@ class ProductVariant(models.Model):
     age_group = models.CharField(max_length=20, choices=AGE_GROUP_CHOICES)
     stock = models.IntegerField(default=0)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    offer_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    offer_percentage = models.PositiveIntegerField(null=True, blank=True, help_text="Auto-calculated if offer_price is given")
 
     def __str__(self):
         return f"{self.product.name} - {self.size}/{self.color_name}"
+
+    def get_effective_price(self):
+        if self.offer_price and self.offer_price < self.price:
+            return self.offer_price
+        return self.price
+
+    def save(self, *args, **kwargs):
+        if self.offer_price and self.offer_price < self.price:
+            self.offer_percentage = int(round(((self.price - self.offer_price) / self.price) * 100))
+        else:
+            self.offer_percentage = None
+        super().save(*args, **kwargs)
 
 class ProductVariantImage(models.Model):
     variant = models.ForeignKey(ProductVariant, related_name='images', on_delete=models.CASCADE)
@@ -74,4 +90,4 @@ class ProductReview(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.product.name} - {self.rating}⭐ by {self.user.username if self.user else 'Anonymous'}"
+        return f"{self.product.name} - {self.rating} star by {self.user.username if self.user else 'Anonymous'}"

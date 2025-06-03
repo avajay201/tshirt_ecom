@@ -3,6 +3,7 @@ from .models import Product, ProductVariant, ProductVariantImage, ProductReview
 from django.conf import settings
 from django.db.models import Avg
 from rest_framework.exceptions import ValidationError
+from datetime import datetime
 
 
 class ProductVariantImageSerializer(serializers.ModelSerializer):
@@ -20,16 +21,31 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductVariant
-        fields = ['id', 'size', 'color_name', 'color_code', 'gender', 'age_group', 'price', 'images']
+        fields = ['id', 'size', 'color_name', 'color_code', 'gender', 'age_group', 'price', 'images', 'offer_price', 'offer_percentage']
 
-class ProductReviews(serializers.ModelSerializer):
+class ProductReviewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductReview
-        fields = ['rating', 'comment', 'created_at']
+        fields = ['rating', 'comment', 'user', 'product', 'created_at']
+        read_only_fields = ['created_at']
+
+    def validate(self, data):
+        user = self.context['request'].user
+        product = data.get('product')
+
+        if user and product:
+            existing_reviews = ProductReview.objects.filter(user=user, product=product).count()
+            if existing_reviews >= 3:
+                raise serializers.ValidationError("You can only submit up to 3 reviews for this product.")
+
+        return data
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['name'] = instance.user.first_name + instance.user.last_name if instance.user else 'Anonymous'
+        representation.pop('user', None)
+        representation.pop('product', None)
+        representation['name'] = instance.user.first_name + ' ' + instance.user.last_name if instance.user else 'Anonymous'
+        representation['created_at'] = datetime.strftime(instance.created_at, '%b %m %Y')
         return representation
 
 class ProductsSerializer(serializers.ModelSerializer):
@@ -64,6 +80,8 @@ class ProductsSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
 
         representation['price'] = variant.price
+        representation['offer_price'] = variant.offer_price
+        representation['offer_percentage'] = variant.offer_percentage
         representation['stock'] = variant.stock
         representation['variant'] = variant.id
 
@@ -73,7 +91,7 @@ class ProductsSerializer(serializers.ModelSerializer):
         representation['sizes'] = list(all_variants.values_list('size', flat=True).distinct())
 
         representation['images'] = ProductVariantImageSerializer(variant.images.all(), many=True).data
-        representation['features'] = []
-        representation['reviews'] = ProductReviews(instance.reviews.all().order_by('-created_at'), many=True).data
+        representation['features'] = instance.features.split('\n') if instance.features else []
+        representation['reviews'] = ProductReviewsSerializer(instance.reviews.all().order_by('-created_at'), many=True).data
         representation['average_rating'] = instance.reviews.aggregate(avg=Avg('rating'))['avg'] or 0
         return representation

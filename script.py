@@ -31,21 +31,49 @@ def generate_product_data():
         "Overcoat", "Zipper Hoodie", "Baby Sweater", "Rompers", "Culottes", "Crop Top"
     ]
 
+    product_features = [
+        "100% Cotton Fabric",
+        "Breathable & Lightweight",
+        "Soft and Comfortable Fit",
+        "Durable Stitching",
+        "Machine Washable",
+        "Pre-shrunk Fabric to Reduce Shrinkage",
+        "Eco-friendly Dyes",
+        "Classic Crew Neck Design",
+        "Wrinkle Resistant",
+        "Tagless Label for Added Comfort"
+    ]
+    
+    product_descriptions = [
+        "Experience all-day comfort with this versatile t-shirt crafted from premium-quality fabric — perfect for daily wear or layering.",
+        "A timeless essential for every wardrobe, this t-shirt blends soft fabric with a modern fit for unmatched comfort and style.",
+        "Stay cool and stylish in this lightweight and breathable t-shirt designed for both casual and active lifestyles.",
+        "Engineered with comfort and durability in mind, this t-shirt offers a smooth feel and long-lasting performance wash after wash.",
+        "Crafted to suit every occasion, this t-shirt combines classic style with functional design — your go-to for effortless dressing."
+    ]
+
     products_data = []
 
     for name in product_names:
+        randomized_features = random.sample(product_features, k=random.randint(4, 7))
         product = {
             "product": {
                 "name": name,
-                "description": fake.sentence(nb_words=12),
+                "description": random.choice(product_descriptions),
                 "tags": ", ".join(fake.words(nb=4)),
-                "base_price": random.choice(prices)
+                "base_price": random.choice(prices),
+                "features": "\n".join(randomized_features)
             },
             "variants": []
         }
 
         for _ in range(random.randint(3, 5)):
             color_name, color_code = random.choice(colors)
+            price = random.choice(prices)
+
+            discount_percentage = random.randint(5, 20)
+            offer_price = price - int(price * (discount_percentage / 100))
+
             variant = {
                 "size": random.choice(sizes),
                 "color_name": color_name,
@@ -53,7 +81,8 @@ def generate_product_data():
                 "gender": random.choice(genders),
                 "age_group": random.choice(age_groups),
                 "stock": random.randint(20, 100),
-                "price": random.choice(prices)
+                "price": price,
+                "offer_price": offer_price,
             }
             product["variants"].append(variant)
 
@@ -70,7 +99,8 @@ def add_product_data(data, img_file_paths):
             name=product_info['name'],
             description=product_info['description'],
             tags=product_info['tags'],
-            base_price=product_info['base_price']
+            base_price=product_info['base_price'],
+            features=product_info['features']
         )
         for variant in variants:
             product_variant = ProductVariant.objects.create(
@@ -81,7 +111,8 @@ def add_product_data(data, img_file_paths):
                 gender=variant['gender'],
                 age_group=variant['age_group'],
                 stock=variant['stock'],
-                price=variant['price']
+                price=variant['price'],
+                offer_price=variant.get('offer_price')
             )
 
             img_paths = random.sample(img_file_paths, k=random.randint(3, 7))
