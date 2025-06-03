@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from .models import Product
 from .serializers import ProductsSerializer
-
+from .filters import ProductFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 class ProductPagination(PageNumberPagination):
     page_size = 12
@@ -13,6 +14,8 @@ class ProductListAPIView(generics.ListAPIView):
     queryset = Product.objects.filter(is_active=True).all()
     serializer_class = ProductsSerializer
     pagination_class = ProductPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilter
 
 class HomeProductListAPIView(APIView):
     def get(self, request):

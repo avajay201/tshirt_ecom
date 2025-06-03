@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'orders',
     'coupons',
     'support',
+    'django_filters'
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -324,3 +325,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ajaykumar.ameotech@gmail.com'
 EMAIL_HOST_PASSWORD = 'ctuoiplxljjmkbja'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
