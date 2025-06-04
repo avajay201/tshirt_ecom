@@ -4,15 +4,58 @@ from products.models import ProductVariant
 # from coupons.models import Coupon
 
 
+INDIAN_STATES_AND_UTS = sorted([
+    # States
+    ("Andhra Pradesh", "Andhra Pradesh"),
+    ("Arunachal Pradesh", "Arunachal Pradesh"),
+    ("Assam", "Assam"),
+    ("Bihar", "Bihar"),
+    ("Chhattisgarh", "Chhattisgarh"),
+    ("Goa", "Goa"),
+    ("Gujarat", "Gujarat"),
+    ("Haryana", "Haryana"),
+    ("Himachal Pradesh", "Himachal Pradesh"),
+    ("Jharkhand", "Jharkhand"),
+    ("Karnataka", "Karnataka"),
+    ("Kerala", "Kerala"),
+    ("Madhya Pradesh", "Madhya Pradesh"),
+    ("Maharashtra", "Maharashtra"),
+    ("Manipur", "Manipur"),
+    ("Meghalaya", "Meghalaya"),
+    ("Mizoram", "Mizoram"),
+    ("Nagaland", "Nagaland"),
+    ("Odisha", "Odisha"),
+    ("Punjab", "Punjab"),
+    ("Rajasthan", "Rajasthan"),
+    ("Sikkim", "Sikkim"),
+    ("Tamil Nadu", "Tamil Nadu"),
+    ("Telangana", "Telangana"),
+    ("Tripura", "Tripura"),
+    ("Uttar Pradesh", "Uttar Pradesh"),
+    ("Uttarakhand", "Uttarakhand"),
+    ("West Bengal", "West Bengal"),
+
+    # Union Territories
+    ("Andaman and Nicobar Islands", "Andaman and Nicobar Islands"),
+    ("Chandigarh", "Chandigarh"),
+    ("Dadra and Nagar Haveli and Daman and Diu", "Dadra and Nagar Haveli and Daman and Diu"),
+    ("Delhi", "Delhi"),
+    ("Jammu and Kashmir", "Jammu and Kashmir"),
+    ("Ladakh", "Ladakh"),
+    ("Lakshadweep", "Lakshadweep"),
+    ("Puducherry", "Puducherry"),
+], key=lambda x: x[0])
+
+
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
     full_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
-    alt_phone_number = models.CharField(max_length=15)
+    alt_phone_number = models.CharField(max_length=15, blank=True, null=True)
     address_line1 = models.CharField(max_length=255)
-    address_line2 = models.CharField(max_length=255, blank=True)
+    address_line2 = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
+    state = models.CharField(max_length=100, choices=INDIAN_STATES_AND_UTS)
     postal_code = models.CharField(max_length=10)
     is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
