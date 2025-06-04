@@ -7,6 +7,8 @@ from .serializers import ProductsSerializer, ProductReviewsSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .utils import get_first_serializer_error
+from .filters import ProductFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class ProductPagination(PageNumberPagination):
@@ -16,6 +18,8 @@ class ProductListAPIView(generics.ListAPIView):
     queryset = Product.objects.filter(is_active=True).all()
     serializer_class = ProductsSerializer
     pagination_class = ProductPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilter
 
 class HomeProductListAPIView(APIView):
     def get(self, request):
