@@ -126,7 +126,7 @@ def add_product_data(data, img_file_paths):
 
 if __name__ == '__main__':
     fake = Faker()
-    img_dir = '/home/ameo/Downloads/tshirt-imgs'
+    img_dir = 'C:/Users/ajayv/Downloads/tshirt-imgs'
     img_files = os.listdir(img_dir)
     img_file_paths = [os.path.join(img_dir, file) for file in img_files]
     data = generate_product_data()
