@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import Address, Order, OrderItem
+from .models import Address, Order, OrderItem, FreeShippingPinCode
 
 
 @admin.register(Address)
@@ -13,4 +13,8 @@ class OrderAdmin(ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(ModelAdmin):
+    pass
+
+@admin.register(FreeShippingPinCode)
+class FreeShippingPinCodeAdmin(ModelAdmin):
     pass

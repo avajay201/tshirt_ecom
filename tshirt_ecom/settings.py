@@ -12,10 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-from django.templatetags.static import static
 import os
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -283,6 +284,12 @@ UNFOLD = {
                         "link": reverse_lazy("admin:orders_address_changelist"),
                         "permission": lambda request: request.user.is_superuser,
                     },
+                    {
+                        "title": _("Free Shipping Pin Codes"),
+                        "icon": "pin_drop",
+                        "link": reverse_lazy("admin:orders_freeshippingpincode_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
                 ],
             },
             {
@@ -317,7 +324,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-BASE_URL = 'http://192.168.19.200:8000'
+BASE_URL = 'http://192.168.1.68:8000'
 
 # Mail Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -326,3 +333,10 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ajaykumar.ameotech@gmail.com'
 EMAIL_HOST_PASSWORD = 'ctuoiplxljjmkbja'
+
+# Shiprocket configuration
+SHIPROCKET_API_URL = os.environ.get('SHIPROCKET_API_URL', '')
+SHIPROCKET_TOKEN = os.environ.get('SHIPROCKET_TOKEN', '')
+SHIPROCKET_EMAIL = os.environ.get('SHIPROCKET_EMAIL', '')
+SHIPROCKET_PASSWORD = os.environ.get('SHIPROCKET_PASSWORD', '')
+PICKUP_PINCODE = os.environ.get('PICKUP_PINCODE', 0)

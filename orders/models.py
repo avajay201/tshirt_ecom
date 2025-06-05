@@ -56,7 +56,7 @@ class Address(models.Model):
     address_line2 = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100, choices=INDIAN_STATES_AND_UTS)
-    postal_code = models.CharField(max_length=10)
+    postal_code = models.CharField(max_length=6)
     is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -83,3 +83,12 @@ class OrderItem(models.Model):
     variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.variant.product.name}, Q:{self.quantity}"
+
+class FreeShippingPinCode(models.Model):
+    pin_code = models.CharField(max_length=6)
+
+    def __str__(self):
+        return self.pin_code
