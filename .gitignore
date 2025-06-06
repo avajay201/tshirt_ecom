@@ -18,6 +18,7 @@ local_settings.py
 /media/
 media/
 myenv/
+db.sqlite3
 
 # VS Code
 .vscode/

@@ -4,7 +4,7 @@ from products.models import ProductVariant
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class CartItem(models.Model):
@@ -13,4 +13,4 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
 
     def get_total_price(self):
-        return self.variant.price * self.quantity
+        return self.variant.offer_price * self.quantity

@@ -52,10 +52,9 @@ class ProductVariant(models.Model):
     age_group = models.CharField(max_length=20, choices=AGE_GROUP_CHOICES)
     stock = models.IntegerField(default=0)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    
+
     offer_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     offer_percentage = models.PositiveIntegerField(null=True, blank=True, help_text="Auto-calculated if offer_price is given")
-
 
     def __str__(self):
         return f"{self.product.name} - {self.size}/{self.color_name}"

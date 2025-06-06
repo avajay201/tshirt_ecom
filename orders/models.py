@@ -1,6 +1,8 @@
 from django.db import models
 from accounts.models import User
 from products.models import ProductVariant
+import random
+import string
 # from coupons.models import Coupon
 
 
@@ -46,6 +48,8 @@ INDIAN_STATES_AND_UTS = sorted([
     ("Puducherry", "Puducherry"),
 ], key=lambda x: x[0])
 
+def generate_order_id():
+    return "ORD" + ''.join(random.choices(string.digits, k=10))
 
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
@@ -65,27 +69,42 @@ class Address(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    order_id = models.CharField(max_length=100, unique=True, editable=False)
     # coupon = models.ForeignKey(Coupon, null=True, blank=True, on_delete=models.SET_NULL)
     # discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    shipping_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.CharField(max_length=20, choices=[
         ('Pending', 'Pending'),
         ('Confirmed', 'Confirmed'),
         ('Shipped', 'Shipped'),
         ('Delivered', 'Delivered'),
-        ('Cancelled', 'Cancelled')
-    ])
+        ('Cancelled', 'Cancelled'),
+        ('Failed', 'Failed'),
+    ], default='Pending')
     shipping_address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if not self.order_id:
+            while True:
+                new_id = generate_order_id()
+                if not Order.objects.filter(order_id=new_id).exists():
+                    self.order_id = new_id
+                    break
+        super().save(*args, **kwargs)
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
-    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    size = models.CharField(max_length=255)
+    color = models.CharField(max_length=255)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(upload_to="ordered_product_variants/")
 
     def __str__(self):
-        return f"{self.variant.product.name}, Q:{self.quantity}"
+        return f"{self.name}, Q:{self.quantity}"
 
 class FreeShippingPinCode(models.Model):
     pin_code = models.CharField(max_length=6)

@@ -9,7 +9,7 @@ class AddressAdmin(ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(ModelAdmin):
-    readonly_fields = ('created_at', )
+    readonly_fields = ('order_id', 'created_at', )
 
 @admin.register(OrderItem)
 class OrderItemAdmin(ModelAdmin):
